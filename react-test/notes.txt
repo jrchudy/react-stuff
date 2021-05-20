@@ -1,0 +1,24 @@
+redux:
+
+action => {
+  type: "",
+  payload: "" || {}
+}
+
+reducer => function (state, action) {
+  do stuff to modify state (state is immutable)
+  returns new state
+}
+
+store:
+create store using reduxTK.configureStore({ reducer: function () {} })
+
+store.getState()
+
+dispatch:
+The only way to update the state is to call store.dispatch({ type: '' }) and pass in an action object.
+think of dispatching actions as "triggering an event"
+
+selectors:
+function foo(state) => return value from passed in state
+currentValue = foo(store.getState())
