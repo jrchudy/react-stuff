@@ -1,0 +1,17 @@
+{
+  "files": {
+    "main.css": "./static/css/main.0385f92f.css",
+    "main.js": "./bundle.js",
+    "main.js.map": "./bundle.js.map",
+    "static/js/1.14f915dc.chunk.js": "./static/js/1.14f915dc.chunk.js",
+    "static/js/1.14f915dc.chunk.js.map": "./static/js/1.14f915dc.chunk.js.map",
+    "bundle.js.LICENSE.txt": "./bundle.js.LICENSE.txt",
+    "index.html": "./index.html",
+    "static/css/main.0385f92f.css.map": "./static/css/main.0385f92f.css.map",
+    "static/media/logo.6ce24c58.svg": "./static/media/logo.6ce24c58.svg"
+  },
+  "entrypoints": [
+    "static/css/main.0385f92f.css",
+    "bundle.js"
+  ]
+}
