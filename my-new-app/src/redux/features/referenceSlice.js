@@ -6,7 +6,10 @@ export const referenceSlice = createSlice({
         appState: "Recordset",
         reference: null,
         page: null,
-        pageSize: 25
+        // reread - should reference be read again
+        // reference - current reference object for index
+        // pageSize - current pageSize
+        refIndexMap: {}
     },
     // NOTE: no clue what 'state' variable is
     reducers: {
@@ -16,16 +19,20 @@ export const referenceSlice = createSlice({
         setPage: (state, action) => {
             state.page = action.refPage;
         },
-        reread: (state, action) => {
-            // given action.reference, read the next/previous page
-            action.reference.read(state.pageSize).then(function (page) {
-                state.page = page;
-            }).catch(function (err) {
-                console.log(err)
-            });
+        initializeRefIndex: (state, action) => {
+            state.refIndexMap[action.refIndex] = { reread: false, reference: action.reference, pageSize: 25, facetChecked: false }
+        },
+        newReference: (state, action) => {
+            let refModel = state.refIndexMap[action.refIndex];
+            refModel.reference = action.reference;
+            refModel.reread = true;
+            refModel.facetChecked = action.facetChecked;
+            refModel.noFaceting = action.noFaceting || false;
         },
         newPageSize: (state, action) => {
-            state.pageSize = parseInt(action.pageSize);
+            let refModel = state.refIndexMap[action.refIndex];
+            refModel.pageSize = parseInt(action.pageSize);
+            refModel.reread = true;
         },
         setAppState: (state, action) => {
             state.appState = action.appState;

@@ -9,8 +9,8 @@ import Record from './components/Record';
 import Recordedit from './components/Recordedit';
 
 const App = (props) => {
-    var [reference, setReference]   = useState(null);
-    var [appState, setAppState]     = useState("Recordset");
+    var [isLoaded, setIsLoaded]         = useState(false);
+    var [appState, setAppState]         = useState("Recordset");
 
     const dispatch = useDispatch();
     // gets the named reducer from the store, see redux/store
@@ -18,78 +18,77 @@ const App = (props) => {
 
     // component mounted, fetch the initial reference and read the data
     useEffect(() => {
-        if(!props.fetched) {
-            var self = this;
-            var config = {skipRetryBrowserError: true, skipHTTP401Handling: true};
-            ERMrest.configure(Axios, Q);
-            ERMrest.onload().then(function () {
-                ERMrest.appLinkFn(function appTagToURL(tag, location, context) {
-                    var appPath;
-                    if (tag && (tag in appTagMapping)) {
-                        appPath = appTagMapping[tag];
-                    } else {
-                        function getValueFromContext(object, context) {
-                            var partial = context,
-                            parts = context.split("/");
-                            while (partial !== "") {
-                                if (partial in object) { // found the context
-                                    return object[partial];
-                                }
-                                parts.splice(-1,1); // remove the last part
-                                partial = parts.join("/");
+        var self = this;
+        var config = {skipRetryBrowserError: true, skipHTTP401Handling: true};
+        ERMrest.configure(Axios, Q);
+        ERMrest.onload().then(function () {
+            ERMrest.appLinkFn(function appTagToURL(tag, location, context) {
+                var appPath;
+                if (tag && (tag in appTagMapping)) {
+                    appPath = appTagMapping[tag];
+                } else {
+                    function getValueFromContext(object, context) {
+                        var partial = context,
+                        parts = context.split("/");
+                        while (partial !== "") {
+                            if (partial in object) { // found the context
+                                return object[partial];
                             }
-                            return object["*"];
+                            parts.splice(-1,1); // remove the last part
+                            partial = parts.join("/");
                         }
-
-                        const appContextMapping = {
-                            detailed: "/record",
-                            compact: "/recordset",
-                            edit: "/recordedit",
-                            entry: "/recordedit"
-                        }
-                        appContextMapping['*'] = "/record";
-
-                        appPath = getValueFromContext(appContextMapping, context);
+                        return object["*"];
                     }
 
-                    var url = "https://dev.isrd.isi.edu/~jchudy/chaise" + appPath + "/#" + location.catalog + "/" + location.path;
-                    var pcontext = [];
-
-                    // var settingsObj = ConfigUtils.getSettings()
-                    var settingsObj = {};
-                    // var contextHeaderParams = ConfigUtils.getContextHeaderParams();
-                    var contextHeaderParams = {};
-                    pcontext.push("pcid=" + contextHeaderParams.cid);
-                    pcontext.push("ppid=" + contextHeaderParams.pid);
-                    // only add the value to the applink function if it's true
-                    if (settingsObj.hideNavbar) pcontext.push("hideNavbar=" + settingsObj.hideNavbar)
-
-                    // TODO we might want to allow only certian query parameters
-                    if (location.queryParamsString) {
-                        url = url + "?" + location.queryParamsString;
+                    const appContextMapping = {
+                        detailed: "/record",
+                        compact: "/recordset",
+                        edit: "/recordedit",
+                        entry: "/recordedit"
                     }
-                    if (pcontext.length > 0) {
-                        url = url + (location.queryParamsString ? "&" : "?") + pcontext.join("&");
-                    }
-                    return url;
-                });
+                    appContextMapping['*'] = "/record";
 
-                return ERMrest.resolve("https://dev.isrd.isi.edu/ermrest/catalog/1/entity/isa:dataset", config);
-            }).then(function (resolvedReference) {
-                let ref = resolvedReference.contextualize.compact;
-                setReference(ref);
-                // dispatch to reducer.name + / + reducer.action (reference/setReference)
-                store.dispatch({ type: "reference/setReference", resolvedReference: ref });
+                    appPath = getValueFromContext(appContextMapping, context);
+                }
 
-                props.fetched = true;
-            }).catch(function (err) {
-                console.log(err)
+                var url = "https://dev.isrd.isi.edu/~jchudy/chaise" + appPath + "/#" + location.catalog + "/" + location.path;
+                var pcontext = [];
+
+                // var settingsObj = ConfigUtils.getSettings()
+                var settingsObj = {};
+                // var contextHeaderParams = ConfigUtils.getContextHeaderParams();
+                var contextHeaderParams = {};
+                pcontext.push("pcid=" + contextHeaderParams.cid);
+                pcontext.push("ppid=" + contextHeaderParams.pid);
+                // only add the value to the applink function if it's true
+                if (settingsObj.hideNavbar) pcontext.push("hideNavbar=" + settingsObj.hideNavbar)
+
+                // TODO we might want to allow only certian query parameters
+                if (location.queryParamsString) {
+                    url = url + "?" + location.queryParamsString;
+                }
+                if (pcontext.length > 0) {
+                    url = url + (location.queryParamsString ? "&" : "?") + pcontext.join("&");
+                }
+                return url;
             });
-        }
+
+            return ERMrest.resolve("https://dev.isrd.isi.edu/ermrest/catalog/1/entity/isa:dataset", config);
+        }).then(function (resolvedReference) {
+            let ref = resolvedReference.contextualize.compact;
+            // dispatch to reducer.name + / + reducer.action (reference/setReference)
+            store.dispatch({ type: "reference/setReference", resolvedReference: ref });
+
+            setIsLoaded(true);
+        }).catch(function (err) {
+            console.log(err)
+        });
     }, []);
 
+    // appState has changed
     useEffect(() => {
         if (referenceStore && referenceStore.appState != appState) {
+            setIsLoaded(false);
             let appName = referenceStore.appState;
             ERMrest.resolve("https://dev.isrd.isi.edu/ermrest/catalog/1/entity/" + referenceStore.referencePath).then(function (resolvedReference) {
                 setAppState(appName);
@@ -103,9 +102,9 @@ const App = (props) => {
                     ref = resolvedReference.contextualize.compact;
                 }
 
-                setReference(ref);
                 store.dispatch({ type: "reference/setReference", resolvedReference: ref });
 
+                setIsLoaded(true);
             }).catch(function (err) {
                 console.log(err)
             });
@@ -113,12 +112,14 @@ const App = (props) => {
     }, [referenceStore, dispatch])
 
     const renderApp = () => {
-        if (appState == "Record") {
-            return (<Record />)
-        } else if (appState == "Recordedit") {
-            return (<Recordedit />)
-        } else {
-            return (<Recordset />)
+        if (isLoaded) {
+            if (appState == "Record") {
+                return (<Record />)
+            } else if (appState == "Recordedit") {
+                return (<Recordedit />)
+            } else {
+                return (<Recordset />)
+            }
         }
     }
 

@@ -7,35 +7,26 @@ import Facet from './Facet';
 
 const TableHeader = (props) => {
     const [selectedPageLimit, setSelectedPageLimit] = useState(25);
-    const [isLoaded, setIsLoaded]                   = useState(false);
     const [aggCount, setAggCount]                   = useState('XXX');
-    const [reference, setReference]                 = useState(null);
 
-    // never going to change
+    // never going to change (unless rerendered);
     const pageLimits = [10, 25, 50, 75, 100, 200];
+    const tableModel = props.tableModel
 
     const dispatch = useDispatch();
     // gets the named reducer from the store, see redux/store
     const referenceStore = useSelector(state => state.reference);
 
-
     // component mounted
     useEffect(() => {
         // do nothing currently since has to wait for reference to resolve
         console.log("Table header mounted");
+        tableModel.reference.getAggregates([tableModel.reference.aggregate.countAgg]).then(function (data) {
+            setAggCount(data[0]);
+        }).catch(function (err) {
+            console.log(err)
+        });
     }, []);
-
-    // when reference store variable is set or changes, make request to fetch agg count
-    useEffect(() => {
-        if (referenceStore && referenceStore.reference != reference) {
-            setReference(referenceStore.reference);
-            referenceStore.reference.getAggregates([referenceStore.reference.aggregate.countAgg]).then(function (data) {
-                setAggCount(data[0]);
-            }).catch(function (err) {
-                console.log(err)
-            });
-        }
-    }, [referenceStore, dispatch]);
 
     const renderPageLimits = () => {
         // <span className={"glyphicon pull-right " + this.state.selectedPageLimit === limit ? 'glyphicon-ok' : 'glyphicon-invisible'}></span>
@@ -44,9 +35,15 @@ const TableHeader = (props) => {
         })
     }
 
+    const renderFaceting = () => {
+        if (!tableModel.noFaceting) {
+            return (<Facet tableModel={tableModel} />)
+        }
+    }
+
     const handlePageLimitChange = (value) => {
         // dispatch to store that reference should be reread
-        store.dispatch({ type: "reference/newPageSize", pageSize: value });
+        store.dispatch({ type: "reference/newPageSize", pageSize: value, refIndex: tableModel.refIndex });
         setSelectedPageLimit(value);
     }
 
@@ -59,7 +56,7 @@ const TableHeader = (props) => {
     // TODO: replace select
     // <span className="caret"></span>
     return(<div style={{margin: "10px 0"}}>
-        <Facet />
+        {renderFaceting()}
         <span>Displaying first <select className="page-size-dropdown chaise-btn chaise-btn-secondary" value={selectedPageLimit} onChange={event => handlePageLimitChange(event.target.value)}>
         {renderPageLimits()}
         </select> of {aggCount} records</span>
