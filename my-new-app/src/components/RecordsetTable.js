@@ -32,4 +32,5 @@ const RecordsetTable = (props) => {
     </div>);
 }
 
+RecordsetTable.whyDidYouRender = true;
 export default RecordsetTable;

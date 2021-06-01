@@ -116,7 +116,7 @@ const App = (props) => {
             if (appState == "Record") {
                 return (<Record />)
             } else if (appState == "Recordedit") {
-                return (<Recordedit />)
+                return (<div id="recordedit"><Recordedit /></div>)
             } else {
                 return (<Recordset />)
             }

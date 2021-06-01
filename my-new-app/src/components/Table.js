@@ -42,12 +42,6 @@ const Table = (props) => {
                 setPageLoaded(false);
                 readData(referenceStore.refIndexMap[tableModel.refIndex].pageSize);
             }
-
-            //
-            // if (referenceStore.page && referenceStore.page != page) {
-            //     setPage(referenceStore.page);
-            //     setPageLoaded(true);
-            // }
         }
     }, [referenceStore, dispatch]);
 

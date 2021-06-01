@@ -10,8 +10,8 @@ const Facet = (props) => {
     // gets the named reducer from the store, see redux/store
     const referenceStore = useSelector(state => state.reference);
 
-    const [checked, setChecked]     = useState(referenceStore.refIndexMap[tableModel.refIndex].facetChecked);
-
+    // defined after referenceStore since it relies on a stored variable
+    const [checked, setChecked] = useState(referenceStore.refIndexMap[tableModel.refIndex].facetChecked);
 
     // component mounted
     useEffect(() => {
@@ -19,16 +19,8 @@ const Facet = (props) => {
         console.log("Facet checkbox mounted");
     }, []);
 
-    // when reference store variable is set or changes
-    // useEffect(() => {
-    //     if (referenceStore && referenceStore.reference != reference) {
-    //         setReference(referenceStore.reference);
-    //     }
-    // }, [referenceStore, dispatch]);
-
     let config = {skipRetryBrowserError: true, skipHTTP401Handling: true};
     const handleCheckboxChange = () => {
-        console.log("checkbox checked");
         if (checked) {
             // get base reference
             setChecked(false);
@@ -52,9 +44,10 @@ const Facet = (props) => {
     }
 
     const renderCheckbox = () => {
+        let toggleText = " Toggle Facet Blob"
         return (<label>
             <input type="checkbox" checked={checked} onChange={handleCheckboxChange} />
-            Toggle Facet Blob
+            {toggleText}
         </label>)
     }
 

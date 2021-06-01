@@ -36,8 +36,14 @@ const TableHeader = (props) => {
     }
 
     const renderFaceting = () => {
-        if (!tableModel.noFaceting) {
+        if (!tableModel.isRelated) {
             return (<Facet tableModel={tableModel} />)
+        }
+    }
+
+    const renderCreate = () => {
+        if (!tableModel.isRelated) {
+            return (<button className="pull-right chaise-btn chaise-btn-primary" onClick={handleCreateClick}>Create</button>);
         }
     }
 
@@ -58,9 +64,9 @@ const TableHeader = (props) => {
     return(<div style={{margin: "10px 0"}}>
         {renderFaceting()}
         <span>Displaying first <select className="page-size-dropdown chaise-btn chaise-btn-secondary" value={selectedPageLimit} onChange={event => handlePageLimitChange(event.target.value)}>
-        {renderPageLimits()}
+            {renderPageLimits()}
         </select> of {aggCount} records</span>
-        <button className="pull-right chaise-btn chaise-btn-primary" onClick={handleCreateClick}>Create</button>
+        {renderCreate()}
     </div>);
 }
 

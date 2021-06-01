@@ -24,12 +24,6 @@ const Recordset = (props) => {
     // reference updated from store
     // update reference and push down to children
     useEffect(() => {
-        // if (referenceStore && referenceStore.reference != appReference) {
-        //     console.log("Recordset reference from store: ", referenceStore.reference.uri);
-        //     setAppReference(referenceStore.reference);
-        //     setIsLoaded(true);
-        // }
-
         if (referenceStore.refIndexMap[refIndex]) {
             let storeReference = referenceStore.refIndexMap[refIndex].reference;
             if (storeReference && storeReference != appReference) {

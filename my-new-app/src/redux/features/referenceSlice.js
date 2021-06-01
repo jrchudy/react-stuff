@@ -6,9 +6,11 @@ export const referenceSlice = createSlice({
         appState: "Recordset",
         reference: null,
         page: null,
+        // map used to keep references organized that use the RecordsetTable component
         // reread - should reference be read again
         // reference - current reference object for index
         // pageSize - current pageSize
+        // facetChecked - was the facet blob changed
         refIndexMap: {}
     },
     // NOTE: no clue what 'state' variable is
@@ -27,7 +29,6 @@ export const referenceSlice = createSlice({
             refModel.reference = action.reference;
             refModel.reread = true;
             refModel.facetChecked = action.facetChecked;
-            refModel.noFaceting = action.noFaceting || false;
         },
         newPageSize: (state, action) => {
             let refModel = state.refIndexMap[action.refIndex];

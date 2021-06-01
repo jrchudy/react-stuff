@@ -37,7 +37,7 @@ const Record = (props) => {
                 console.log(newPage.tuples[0])
 
                 refToRead.related.map((relatedRef, index) => {
-                    store.dispatch({ type: "reference/initializeRefIndex", refIndex: index, reference: relatedRef.contextualize.compactBrief, noFaceting: true });
+                    store.dispatch({ type: "reference/initializeRefIndex", refIndex: index, reference: relatedRef.contextualize.compactBrief });
                 });
 
                 setIsLoaded(true);
@@ -49,24 +49,33 @@ const Record = (props) => {
 
     const renderDisplayName = () => {
         if (isLoaded) {
-            var displaynameObj = tuple.displayname;
-            return (<h2>
+            let refDisplaynameObj = reference.displayname,
+                displaynameObj = tuple.displayname,
+                separator = ": ";
+
+            return (<h1>
+                <a href="https://dev.isrd.isi.edu/~jchudy/build/">
+                    {refDisplaynameObj.isHTML
+                        ? <span className="markdown-container" dangerouslySetInnerHTML={{ __html: refDisplaynameObj.value }}></span>
+                        : <span>{refDisplaynameObj.value}</span>
+                    }
+                </a>{separator}
                 {displaynameObj.isHTML
                     ? <span className="markdown-container" dangerouslySetInnerHTML={{ __html: displaynameObj.value }}></span>
                     : <span>{displaynameObj.value}</span>
                 }
-            </h2>)
+            </h1>)
         }
     }
 
     const renderRelatedDisplayName = (reference) => {
         var displaynameObj = reference.displayname;
-        return (<h3>
+        return (<h2 className="related-heading">
             {displaynameObj.isHTML
                 ? <span className="markdown-container" dangerouslySetInnerHTML={{ __html: displaynameObj.value }}></span>
                 : <span>{displaynameObj.value}</span>
             }
-        </h3>)
+        </h2>)
     }
 
     const renderMainRecord = () => {
@@ -98,7 +107,7 @@ const Record = (props) => {
                 let contextualizedReference = relatedRef.contextualize.compactBrief;
                 return (<div key={index}>
                     {renderRelatedDisplayName(contextualizedReference)}
-                    <RecordsetTable tableModel={{reference: contextualizedReference, refIndex: index, noFaceting: true}} />
+                    <RecordsetTable tableModel={{reference: contextualizedReference, refIndex: index, isRelated: true}} />
                 </div>)
             });
         }

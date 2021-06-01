@@ -7,11 +7,21 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+.chaise-body .app-container {
+    display: unset !important;
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
 
-h3 {
+h2 {
     margin-top: 30px;
+}
+
+h2.related-heading {
+    color: #fff;
+    background: #747474;
+    padding: 10px;
 }
